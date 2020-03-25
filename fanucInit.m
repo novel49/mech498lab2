@@ -1,3 +1,8 @@
+% Annabel Chang & Tori Joshi
+% MECH 498
+% Lab 2: Robot Picasso
+% March 30, 2020
+
 function [ fanuc_struct ] = fanucInit()
 % MECH 498/598 - Intro to Robotics - Spring 2016
 % Lab 2 - Inverse Kinematics

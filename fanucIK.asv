@@ -24,7 +24,7 @@ r = sqrt(fanuc_struct.parameters.l_4^2 + fanuc_struct.parameters.l_5^2);
 %We can find angle made by these offsets using invrese tangent of the triangle made by the
 %offsets (called gamma)
 gamma = atan2(d4,a4);
-%find the length between {2} and {4}
+%
 %theta3prime - use right triangle to find s, use that triangle to find
 %theat3prime
 s = sqrt(Pprime(2,1)^2 + Pprime(1,1)^2) - fanuc_struct.parameters.l_2;
@@ -33,15 +33,13 @@ theta3prime = acos((s^2 - r^2 - fanuc.struct.parameters.l_3^2)/(-2*r*fanuc_struc
 theta3 = theta3prime + gamma - pi;
 
 %THETA2
-%Determine the length between {2} and the base of {4} on the XY plane
+%Determine the length between {2} and {4} (named c)
 a = sqrt(Pprime(2,1)^2 + Pprime(1,1)^2) - fanuc.struct.parameters.l_2;
 b = Pprime(3,1);
-%Determine the distance between {2} and {4} = this is an [unnecessary] check from the
-%previous step
 c = sqrt(a^2 + b^2);
-%Determine angle between ground and {4} - Law of Cosines
+%Determine angle between ground and {4}
 phi = acos((b^2 - c^2 - a^2)/(-2*a*c));
-%Determine angle between c and Link 3 - Law of Cosines
+%Determine angle between c and Fanuc Link 3
 psi = acos((r^2 - c^2 - fanuc.struct.parameters.l_3^2)/(-2*c*fanuc.struct.parameters.l_3));
 %Subtract these angles from 90 to find the desired theta2 angle
 theta2 = pi/2 - phi - psi;

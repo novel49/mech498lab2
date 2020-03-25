@@ -1,7 +1,7 @@
 % Annabel Chang & Tori Joshi
 % MECH 498
 % Lab 2: Robot Picasso
-% March 27, 2020
+% March 30, 2020
 
 function T = dhtf(alpha, a, d, theta)
 %Given the DH parameters, find the corresponding standard transformation

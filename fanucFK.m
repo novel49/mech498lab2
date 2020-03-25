@@ -1,3 +1,8 @@
+% Annabel Chang & Tori Joshi
+% MECH 498
+% Lab 2: Robot Picasso
+% March 30, 2020
+
 function [T, fanuc_T] = fanucFK(joint_angles, fanuc)
 % MECH 498 - Annabel Chang
 % Accepts a 6-element vector of joint angles and the structure output
