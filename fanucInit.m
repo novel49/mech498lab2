@@ -101,7 +101,5 @@ fanuc_struct.colors{5} = [0,1,1];
 fanuc_struct.colors{6} = [1,0,1];
 fanuc_struct.colors{7} = [.5,.5,.5];
 
-
-
 end
 
