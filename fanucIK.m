@@ -26,7 +26,7 @@ end
 
 %Verify which solution for theta1 is closer to the previous joints. And the
 %knowledge of what case you are in is a nady tool that will help us later.
-if (abs(theta1_1 - prev_joint_angles(1)) <= abs(theta1_1 - prev_joint_angles(1)))
+if (abs(theta1_1 - prev_joint_angles(1)) <= abs(theta1_2 - prev_joint_angles(1)))
     theta1 = theta1_1;
     plus180 = 0;
 else
@@ -44,7 +44,7 @@ gamma = atan2(fanuc.parameters.l_4,fanuc.parameters.l_5);
 if plus180 == 0
     s = sqrt(Pprime(2,1)^2 + Pprime(1,1)^2) - fanuc.parameters.l_2;
 else
-    s = sqrt(Pprime(2,1)^2 + Pprime(1,1)^2) + fanuc.parameters.l_2;
+    s = -(sqrt(Pprime(2,1)^2 + Pprime(1,1)^2) + fanuc.parameters.l_2);
 end
 t = sqrt(s^2 + Pprime(3,1)^2);
 %theta3prime - use right triangle to find s, use that triangle to find
@@ -70,7 +70,7 @@ end
 %I redefined some variables for this from the theta3 calculations, which I probably should not have
 %done, but here we are.
 %Determine the length between {2} and the base of {4} on the XY plane
-a = sqrt(Pprime(2,1)^2 + Pprime(1,1)^2) - fanuc.parameters.l_2;
+a = s;
 b = Pprime(3,1);
 %Determine the distance between {2} and {4} = this is an [unnecessary] check from the
 %previous step
@@ -80,13 +80,13 @@ phi = acos((b^2 - c^2 - a^2)/(-2*a*c));
 %Determine angle between c and Link 3 - Law of Cosines
 psi = acos((r^2 - c^2 - fanuc.parameters.l_3^2)/(-2*c*fanuc.parameters.l_3));
 %Subtract these angles from 90 to find the desired theta2 angle
-theta2 = psi + phi - pi/2;
+theta2 = (-1)^plus180*psi + phi - pi/2;
 
 %END EFFECTOR
 %Isolate the numerical transofrmation matrix for the end effector.
-T1 = dhtf(0,0,0,prev_joint_angles(1));
-T2 = dhtf(pi/2,fanuc.parameters.l_2,0,prev_joint_angles(2)+pi/2);
-T3 = dhtf(0,fanuc.parameters.l_3,0,prev_joint_angles(3));
+T1 = dhtf(0,0,0,theta1);
+T2 = dhtf(pi/2,fanuc.parameters.l_2,0,theta2+pi/2);
+T3 = dhtf(0,fanuc.parameters.l_3,0,theta3);
 T13 = T1 * T2 * T3;
 
 R13 = T13(1:3,1:3)';

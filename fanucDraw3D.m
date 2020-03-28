@@ -31,13 +31,14 @@ for t = 1:size(s,2)
     
     % Set desired brush color from path file (think about how to handle
     % changes in color)
-    fanuc.brush = [];
+    fanuc.brush = data.c(t);
     ...
     
     % Select desired orientation for the tool (your choice)
     ...
     
     % Set desired position for the tool from path file (not your choice)
+    joint_angles = [
     ...
     
     % Solve inverse kinematics for nearest solution
