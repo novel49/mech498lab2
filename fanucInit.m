@@ -3,7 +3,7 @@
 % Lab 2: Robot Picasso
 % March 30, 2020
 
-function [ fanuc_struct ] = fanucInit()
+function [fanuc_struct] = fanucInit()
 % MECH 498/598 - Intro to Robotics - Spring 2016
 % Lab 2 - Inverse Kinematics
 %
@@ -77,13 +77,14 @@ fanuc_struct.brush_colors{4} = [0,0.4470,0.7410];
 fanuc_struct.base = makehgtform('translate',[0,0,l_1]);
 
 % FANUC joint limits (deg)
+% These values assigned using the FANUC spec sheet
 deg2rad = pi/180;
-fanuc_struct.joint_limits{1} = [0,0]*deg2rad;
-fanuc_struct.joint_limits{2} = [0,0]*deg2rad;
-fanuc_struct.joint_limits{3} = [0,0]*deg2rad;
-fanuc_struct.joint_limits{4} = [0,0]*deg2rad;
-fanuc_struct.joint_limits{5} = [0,0]*deg2rad;
-fanuc_struct.joint_limits{6} = [0,0]*deg2rad;
+fanuc_struct.joint_limits{1} = [-150,150]*deg2rad;
+fanuc_struct.joint_limits{2} = [-80,80]*deg2rad;
+fanuc_struct.joint_limits{3} = [-80,80]*deg2rad;
+fanuc_struct.joint_limits{4} = [-240,240]*deg2rad;
+fanuc_struct.joint_limits{5} = [-120,120]*deg2rad;
+fanuc_struct.joint_limits{6} = [-450,450]*deg2rad;
 
 % Set bounds on the cartesian workspace of the FANUC for plotting in the
 % form:  [ xmin, xmax, ymin, ymax, zmin, zmax]

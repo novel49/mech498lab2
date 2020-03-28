@@ -11,30 +11,66 @@ function [is_solution,joint_angles] = fanucIK(T,prev_joint_angles,fanuc)
 % position vector.
 R = T(1:3,1:3);
 P = T(1:3, 4);
-Rnew = R * [0;0;-180];
-Pprime = P - Rnew;
+Rnew = R * [0;0;-fanuc.parameters.l_6];
+Pprime = P + Rnew;
 
 %THETA1
 %Determine theta1 (use x & y coordinates to determine rotation)
-theta1 = atan2(Pprime(2,1),Pprime(1,1));
+theta1_1 = atan2(Pprime(2,1),Pprime(1,1));
+%Theta1 should be between -5pi/6 and +5pi/6.
+if theta1_1 < 0
+    theta1_2 = theta1_1 + pi;
+else
+    theta1_2 = theta1_1 - pi;
+end
+
+%Verify which solution for theta1 is closer to the previous joints. And the
+%knowledge of what case you are in is a nady tool that will help us later.
+if (abs(theta1_1 - prev_joint_angles(1)) <= abs(theta1_1 - prev_joint_angles(1)))
+    theta1 = theta1_1;
+    plus180 = 0;
+else
+    theta1 = theta1_2;
+    plus180 = 1;
+end
 
 %THETA3
 %Find hypotenuse between links 4 and 5 using Pythagorean Theorem (called r)
-r = sqrt(fanuc_struct.parameters.l_4^2 + fanuc_struct.parameters.l_5^2);
+r = sqrt(fanuc.parameters.l_4^2 + fanuc.parameters.l_5^2);
 %We can find angle made by these offsets using invrese tangent of the triangle made by the
 %offsets (called gamma)
-gamma = atan2(d4,a4);
+gamma = atan2(fanuc.parameters.l_4,fanuc.parameters.l_5);
 %find the length between {2} and {4}
+if plus180 == 0
+    s = sqrt(Pprime(2,1)^2 + Pprime(1,1)^2) - fanuc.parameters.l_2;
+else
+    s = sqrt(Pprime(2,1)^2 + Pprime(1,1)^2) + fanuc.parameters.l_2;
+end
+t = sqrt(s^2 + Pprime(3,1)^2);
 %theta3prime - use right triangle to find s, use that triangle to find
-%theat3prime
-s = sqrt(Pprime(2,1)^2 + Pprime(1,1)^2) - fanuc_struct.parameters.l_2;
-theta3prime = acos((s^2 - r^2 - fanuc.struct.parameters.l_3^2)/(-2*r*fanuc_struct.parameters.l_3));
+%theta3prime. Also, here you need to know whether you used the alternate
+%theta1 term
+cos3 = ((t^2 - r^2 - fanuc.parameters.l_3^2)/(2*r*fanuc.parameters.l_3));
+%Take both cases into account.
+theta3prime_minus = atan2(-sqrt(1-cos3^2),cos3);
+theta3prime_plus = atan2(sqrt(1-cos3^2),cos3);
+
 %From these, calculate theta3
-theta3 = theta3prime + gamma - pi;
+theta3minus = theta3prime_minus + pi/2 - gamma;
+theta3plus = theta3prime_plus + pi/2 - gamma;
+
+%Choose the theta3 value that is closest to the previous joint.
+if (abs(theta3minus - prev_joint_angles(3)) <= abs(theta3plus - prev_joint_angles(3)))
+    theta3 = theta3minus;
+else
+    theta3 = theta3plus;
+end
 
 %THETA2
+%I redefined some variables for this from the theta3 calculations, which I probably should not have
+%done, but here we are.
 %Determine the length between {2} and the base of {4} on the XY plane
-a = sqrt(Pprime(2,1)^2 + Pprime(1,1)^2) - fanuc.struct.parameters.l_2;
+a = sqrt(Pprime(2,1)^2 + Pprime(1,1)^2) - fanuc.parameters.l_2;
 b = Pprime(3,1);
 %Determine the distance between {2} and {4} = this is an [unnecessary] check from the
 %previous step
@@ -42,9 +78,60 @@ c = sqrt(a^2 + b^2);
 %Determine angle between ground and {4} - Law of Cosines
 phi = acos((b^2 - c^2 - a^2)/(-2*a*c));
 %Determine angle between c and Link 3 - Law of Cosines
-psi = acos((r^2 - c^2 - fanuc.struct.parameters.l_3^2)/(-2*c*fanuc.struct.parameters.l_3));
+psi = acos((r^2 - c^2 - fanuc.parameters.l_3^2)/(-2*c*fanuc.parameters.l_3));
 %Subtract these angles from 90 to find the desired theta2 angle
-theta2 = pi/2 - phi - psi;
+theta2 = psi + phi - pi/2;
 
+%END EFFECTOR
+%Isolate the numerical transofrmation matrix for the end effector.
+T1 = dhtf(0,0,0,prev_joint_angles(1));
+T2 = dhtf(pi/2,fanuc.parameters.l_2,0,prev_joint_angles(2)+pi/2);
+T3 = dhtf(0,fanuc.parameters.l_3,0,prev_joint_angles(3));
+T13 = T1 * T2 * T3;
 
+R13 = T13(1:3,1:3)';
+P13 = -R13 * T13(1:3,4);
+invT13 = [R13 P13];
+invT13 = [invT13; 0 0 0 1];
+T46 = invT13*T;
+
+%THETA5
+sin5  = sqrt(T46(2,1)^2+T46(2,2)^2);
+theta5_1 = atan2(sin5,-T46(2,3));
+theta5_2 = atan2(-sin5,-T46(2,3));
+
+if (abs(theta5_1 - prev_joint_angles(5)) <= abs(theta5_2 - prev_joint_angles(5)))
+    theta5 = theta5_1;
+else
+    theta5 = theta5_2;
 end
+
+%THETA4
+cos4 = T46(1,3)/sin(theta5);
+sin4 = T46(3,3)/sin(theta5);
+theta4 = atan2(sin4,cos4);
+
+%Heads up, there is a singularity when theta5 equals zero.u
+cos6 = T46(2,1)/sin(theta5);
+sin6 = T46(2,2)/-sin(theta5);
+theta6 = atan2(sin6,cos6);
+
+%Throw all the calculated angles into one vector.
+joint_angles = [theta1 theta2 theta3 theta4 theta5 theta6];
+
+%Verify that the solution actually works with the robot in physical
+%space...
+if fanuc.workspace(1) <= T(1,4) <= fanuc.workspace(2)...
+    && fanuc.workspace(3) <= T(2,4) <= fanuc.workspace(4)...
+    && fanuc.workspace(5) <= T(3,4) <= fanuc.workspace(6)...
+    && fanuc.joint_limits{1}(1) <= joint_angles(1) <= fanuc.joint_limits{1}(2)...
+    && fanuc.joint_limits{2}(1) <= joint_angles(2) <= fanuc.joint_limits{2}(2)...
+    && fanuc.joint_limits{3}(1) <= joint_angles(3) <= fanuc.joint_limits{3}(2)...
+    && fanuc.joint_limits{4}(1) <= joint_angles(4) <= fanuc.joint_limits{4}(2)...
+    && fanuc.joint_limits{5}(1) <= joint_angles(5) <= fanuc.joint_limits{5}(2)...
+    && fanuc.joint_limits{6}(1) <= joint_angles(6) <= fanuc.joint_limits{6}(2)
+    is_solution = 1;
+else
+    is_solution = 0;
+end
+
