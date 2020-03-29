@@ -24,7 +24,7 @@ c = data.c; % color
 % Draw FANUC initially in zero position (do not change)
 prev_angles = zeros(1,6);
 fanuc.handles = drawFanuc(prev_angles,fanuc);
-hold on;
+hold on
 
 % Draw in 3D
 for t = 1:size(s,2)
@@ -38,32 +38,29 @@ for t = 1:size(s,2)
     tool_rotate = [1 0 0; 0 -1 0; 0 0 -1];
     
     % Set desired position for the tool from path file (not your choice)
-    final_point = [data.s(1,t); data.s(2,t); data.s(3,t)];
+    final_point = [s(1,t); s(2,t); s(3,t)];
     final_frame = final_point - [0; 0; fanuc.parameters.l_t];
     T = [tool_rotate final_frame];
     T = [T; 0 0 0 1];
         
-% Solve inverse kinematics for nearest solution
-%[T,~] = fanucFK(joint_angles,fanuc);
+    % Solve inverse kinematics for nearest solution
+    [is_solution,joint_angles] = fanucIK(T,prev_angles,fanuc);
 
-% R = T(1:3,1:3);
-% P = T(1:3, 4);
-% Rnew = R * [0;0;fanuc.parameters.l_t];
-% Pactual = P + Rnew;
-% T(1:3,4) = Pactual;
+    % Move robot using setFanuc() if solution exists
+    if is_solution == 1
+        setFanuc(joint_angles,fanuc);
 
-[is_solution,joint_angles] = fanucIK(T,prev_angles,fanuc);
-
-% Move robot using setFanuc() if solution exists
-if is_solution == 1
-    setFanuc(joint_angles, fanuc );
-    
-    % Plot a point at the tool brush tip with the appropriate color
-    % (unless the brush selection is zero)
-    if fanuc.brush ~= 0     
-        % Update previous joint angles
-        prev_angles = joint_angles;
+        % Plot a point at the tool brush tip with the appropriate color
+        % (unless the brush selection is zero)
+        if fanuc.brush ~= 0
+            brush_color = fanuc.brush_colors{data.c(t)};
+            plot3(final_point(1),final_point(2),final_point(3),'.','Color',brush_color);
+            % Update previous joint angles
+            prev_angles = joint_angles;
+        end
     end
 end
-end
 
+hold off
+
+end
