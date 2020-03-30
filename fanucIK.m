@@ -50,7 +50,7 @@ t = sqrt(s^2 + Pprime(3,1)^2);
 %theta3prime - use right triangle to find s, use that triangle to find
 %theta3prime. Also, here you need to know whether you used the alternate
 %theta1 term
-cos3 = ((t^2 - r^2 - fanuc.parameters.l_3^2)/(2*r*fanuc.parameters.l_3));
+cos3 = round(((t^2 - r^2 - fanuc.parameters.l_3^2)/(2*r*fanuc.parameters.l_3)),10);
 %Take both cases into account.
 theta3prime_minus = atan2(-sqrt(1-cos3^2),cos3);
 theta3prime_plus = atan2(sqrt(1-cos3^2),cos3);
@@ -111,7 +111,9 @@ cos4 = T46(1,3)/sin(theta5);
 sin4 = T46(3,3)/sin(theta5);
 theta4 = atan2(sin4,cos4);
 
-%Heads up, there is a singularity when theta5 equals zero.u
+%Heads up, there is a singularity when theta5 equals zero.
+
+%THETA6
 cos6 = T46(2,1)/sin(theta5);
 sin6 = T46(2,2)/-sin(theta5);
 theta6 = atan2(sin6,cos6);

@@ -129,7 +129,7 @@ set(hg,'Parent',T_5);
 h = drawRobotFrame(fanuc.colors{6});
 hg = hggroup('Parent',ax);
 set(h,'Parent',hg);
-L_6 = line([0,l_6],[0,0],[0,0],...
+L_6 = line([0,0],[0,0],[0,-l_6],...
     'Color',fanuc.colors{6},'LineWidth',1.5);
 set(L_6,'Parent',hg);
 T_6 = hgtransform('Parent',T_5,'Matrix',fanuc_T{6});
