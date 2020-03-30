@@ -12,7 +12,7 @@ function setFanuc( angles, fanuc )
 %    This function can be used as is once fanucFK() and drawFanuc() have been
 %    completed.
 % 
-% 
+% NO TOUCHY
 
 [~,fanuc_T] = fanucFK(angles,fanuc);
 set(fanuc.handles(1),'Matrix',fanuc_T{1});

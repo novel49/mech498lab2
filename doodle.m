@@ -12,7 +12,7 @@ function doodle()
 % Set down cone
 n = 200; % size factor
 m = 800; % shift factor
-t = linspace(0,2*pi,401);
+t = linspace(0,2*pi,2001);
 r = sqrt(abs(2*sin(10*t)));
 [x y]=pol2cart(t,r);
 z2 = 1.5*(x.^2+y.^2);
@@ -21,7 +21,7 @@ c = ones(1,length(s));
 
 % Dispense ice cream
 n2 = n*1.4;
-t2 = linspace(0,2*pi,201);
+t2 = linspace(0,2*pi,1001);
 x2 = sin(t2).*cos(10*t2);
 y2 = sin(t2).*sin(10*t2);
 z2 = cos(t2);
@@ -47,7 +47,7 @@ s4 = [x4*n4+m; y4*n4+m; z4*n4+1300];
 s = [s s4];
 c = [c 3*ones(1,length(s4))];
 
-save doodle c s
+save IceCream.mat c s
 % Enjoy
 
 end

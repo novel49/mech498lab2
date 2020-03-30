@@ -15,46 +15,37 @@ function MagicSphere()
 % Call mat file with robot
 % profit
 
-%Create one color spiral
+%Create one color spiral.
 
 t = 0:pi/500:pi;
 one(1,:) = sin(t).*cos(10*t);
 one(2,:) = sin(t).*sin(10*t);
 one(3,:) = cos(t);
 
-two(1,:) = sin(t).*cos(12*t);
-two(2,:) = sin(t).*sin(12*t);
+%Create a second color spiral.
+
+two(1,:) = sin(t).*cos(15*t);
+two(2,:) = sin(t).*sin(15*t);
 two(3,:) = cos(t);
+
+%Create a third color spiral.
 
 three(1,:) = sin(t).*cos(20*t);
 three(2,:) = sin(t).*sin(20*t);
 three(3,:) = cos(t);
 
-s = [one flip(two,2) three]*500 + [200; 0; 1500];
-c = [ones(1,501) ones(1,501)*2 ones(1,501)*3];
+%Create a 
 
-% s = s*100 + [200; 0; 1000];
-% c = ones(1,501);
+%Combine them all tpgether (flip the order of the second matrix so the
+%robot's path is not jerky between spirals.)
+
+s = [one flip(two,2) three]*100 + [200; 0; 1500];
+
+%Choose colors for different paths.
+
+c = [ones(1,501) ones(1,501)*3 ones(1,501)*4];
 
 save MagicSphere.mat s c
-
-% Y(1,:) = sin(t).*sin(10*t);
-% Y(2,:) = sin(t).*sin(12*t);
-% Y(3,:) = sin(t).*sin(20*t);
-% 
-% Z = cos(t);
-
-% coordinates = [X; Y; Z];
-
-% t = 0:pi/500:pi;
-
-% X(1,:) = sin(t).*cos(10*t);
-% X(2,:) = sin(t).*cos(12*t);
-% X(3,:) = sin(t).*cos(20*t);
-% 
-% Y(1,:) = sin(t).*sin(10*t);
-% Y(2,:) = sin(t).*sin(12*t);
-% Y(3,:) = sin(t).*sin(20*t);
 
 % https://www.mathworks.com/help/matlab/ref/plot3.html
 % For more code ideas.

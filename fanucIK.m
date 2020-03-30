@@ -25,7 +25,7 @@ else
 end
 
 %Verify which solution for theta1 is closer to the previous joints. And the
-%knowledge of what case you are in is a nady tool that will help us later.
+%knowledge of what case you are in is a handy tool that will help us later.
 if (abs(theta1_1 - prev_joint_angles(1)) <= abs(theta1_2 - prev_joint_angles(1)))
     theta1 = theta1_1;
     plus180 = 0;
@@ -67,13 +67,10 @@ else
 end
 
 %THETA2
-%I redefined some variables for this from the theta3 calculations, which I probably should not have
-%done, but here we are.
 %Determine the length between {2} and the base of {4} on the XY plane
 a = s;
 b = Pprime(3,1);
-%Determine the distance between {2} and {4} = this is an [unnecessary] check from the
-%previous step
+%Determine the distance between {2} and {4}
 c = sqrt(a^2 + b^2);
 %Determine angle between ground and {4} - Law of Cosines
 phi = acos((b^2 - c^2 - a^2)/(-2*a*c));
@@ -83,7 +80,7 @@ psi = acos((r^2 - c^2 - fanuc.parameters.l_3^2)/(-2*c*fanuc.parameters.l_3));
 theta2 = (-1)^plus180*psi + phi - pi/2;
 
 %END EFFECTOR
-%Isolate the numerical transofrmation matrix for the end effector.
+%Isolate the numerical transformation matrix for the end effector to compare numerical and symbolic elements while saving computational power.
 T1 = dhtf(0,0,0,theta1);
 T2 = dhtf(pi/2,fanuc.parameters.l_2,0,theta2+pi/2);
 T3 = dhtf(0,fanuc.parameters.l_3,0,theta3);
@@ -91,27 +88,30 @@ T13 = T1 * T2 * T3;
 
 R13 = T13(1:3,1:3)';
 P13 = -R13 * T13(1:3,4);
-invT13 = [R13 P13];
-invT13 = [invT13; 0 0 0 1];
+invT13 = [R13 P13; 0 0 0 1];
 T46 = invT13*T;
 
 %THETA5
+%Using the symbolic solution for T46, it is possible to isolate sin and cos
+%values for each angle, and use them to find the numerical theta values.
 sin5  = sqrt(T46(2,1)^2+T46(2,2)^2);
 theta5_1 = atan2(sin5,-T46(2,3));
 theta5_2 = atan2(-sin5,-T46(2,3));
 
+%Because there are two options for theta5, choose the one closest to the
+%current position.
 if (abs(theta5_1 - prev_joint_angles(5)) <= abs(theta5_2 - prev_joint_angles(5)))
     theta5 = theta5_1;
 else
     theta5 = theta5_2;
 end
 
+%Heads up, there is a singularity when theta5 = 0.
+
 %THETA4
 cos4 = T46(1,3)/sin(theta5);
 sin4 = T46(3,3)/sin(theta5);
 theta4 = atan2(sin4,cos4);
-
-%Heads up, there is a singularity when theta5 equals zero.
 
 %THETA6
 cos6 = T46(2,1)/sin(theta5);
@@ -124,14 +124,14 @@ joint_angles = [theta1 theta2 theta3 theta4 theta5 theta6];
 %Verify that the solution actually works with the robot in physical
 %space...
 if fanuc.workspace(1) <= T(1,4) <= fanuc.workspace(2)...
-    && fanuc.workspace(3) <= T(2,4) <= fanuc.workspace(4)...
-    && fanuc.workspace(5) <= T(3,4) <= fanuc.workspace(6)...
-    && fanuc.joint_limits{1}(1) <= joint_angles(1) <= fanuc.joint_limits{1}(2)...
-    && fanuc.joint_limits{2}(1) <= joint_angles(2) <= fanuc.joint_limits{2}(2)...
-    && fanuc.joint_limits{3}(1) <= joint_angles(3) <= fanuc.joint_limits{3}(2)...
-    && fanuc.joint_limits{4}(1) <= joint_angles(4) <= fanuc.joint_limits{4}(2)...
-    && fanuc.joint_limits{5}(1) <= joint_angles(5) <= fanuc.joint_limits{5}(2)...
-    && fanuc.joint_limits{6}(1) <= joint_angles(6) <= fanuc.joint_limits{6}(2)
+        && fanuc.workspace(3) <= T(2,4) <= fanuc.workspace(4)...
+        && fanuc.workspace(5) <= T(3,4) <= fanuc.workspace(6)...
+        && fanuc.joint_limits{1}(1) <= joint_angles(1) <= fanuc.joint_limits{1}(2)...
+        && fanuc.joint_limits{2}(1) <= joint_angles(2) <= fanuc.joint_limits{2}(2)...
+        && fanuc.joint_limits{3}(1) <= joint_angles(3) <= fanuc.joint_limits{3}(2)...
+        && fanuc.joint_limits{4}(1) <= joint_angles(4) <= fanuc.joint_limits{4}(2)...
+        && fanuc.joint_limits{5}(1) <= joint_angles(5) <= fanuc.joint_limits{5}(2)...
+        && fanuc.joint_limits{6}(1) <= joint_angles(6) <= fanuc.joint_limits{6}(2)
     is_solution = 1;
 else
     is_solution = 0;

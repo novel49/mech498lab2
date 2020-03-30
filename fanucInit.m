@@ -77,7 +77,7 @@ fanuc_struct.brush_colors{4} = [0,0.4470,0.7410];
 fanuc_struct.base = makehgtform('translate',[0,0,l_1]);
 
 % FANUC joint limits (deg)
-% These values assigned using the FANUC spec sheet
+% These values were assigned using the FANUC spec sheet
 deg2rad = pi/180;
 fanuc_struct.joint_limits{1} = [-150,150]*deg2rad;
 fanuc_struct.joint_limits{2} = [-80,80]*deg2rad;
@@ -88,18 +88,19 @@ fanuc_struct.joint_limits{6} = [-450,450]*deg2rad;
 
 % Set bounds on the cartesian workspace of the FANUC for plotting in the
 % form:  [ xmin, xmax, ymin, ymax, zmin, zmax]
+% These values were assigned using the provided FANUC spec sheet.
 fanuc_struct.workspace = [-2739 2739 -2739 2739 -721 3238];
 ...
-
+    
 % Set colors to be drawn for each link and associated frame, including the
 % tool
-fanuc_struct.colors{1} = [0,1,0];
-fanuc_struct.colors{2} = [1,0,0];
-fanuc_struct.colors{3} = [0,0,1];
-fanuc_struct.colors{4} = [1,.5,0];
-fanuc_struct.colors{5} = [0,1,1];
-fanuc_struct.colors{6} = [1,0,1];
-fanuc_struct.colors{7} = [.5,.5,.5];
+fanuc_struct.colors{1} = [0,0,1];
+fanuc_struct.colors{2} = [0,0,.7];
+fanuc_struct.colors{3} = [0,0,.5];
+fanuc_struct.colors{4} = [0,0,.2];
+fanuc_struct.colors{5} = [0,.5,1];
+fanuc_struct.colors{6} = [0,.5,.7];
+fanuc_struct.colors{7} = [0,.5,.5];
 
 end
 
