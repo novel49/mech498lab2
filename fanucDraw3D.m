@@ -29,7 +29,7 @@ fanuc.handles = drawFanuc(prev_angles,fanuc);
 hold on
 
 % Draw in 3D
-for t = 1:size(s,2)    
+for t = 1:size(s,2)
     % Set desired brush color from path file (think about how to handle
     % changes in color)
     fanuc.brush = data.c(t);
@@ -42,7 +42,7 @@ for t = 1:size(s,2)
     final_point = [s(1,t); s(2,t); s(3,t)];
     new_frame = tool_rotate * -fanuc.tool{1}(1:3,4);
     final_frame = final_point + new_frame;
-    T = [tool_rotate final_frame; 0 0 0 1]; 
+    T = [tool_rotate final_frame; 0 0 0 1];
     
     % Solve inverse kinematics for nearest solution
     [is_solution,joint_angles] = fanucIK(T,prev_angles,fanuc);
@@ -54,11 +54,11 @@ for t = 1:size(s,2)
     elseif fanuc.brush == 4 % blue
         joint_angles = joint_angles + [0 0 0 0 0 pi/2];
     end
-      
+    
     % Move robot using setFanuc() if solution exists
     if is_solution == 1
         setFanuc(joint_angles,fanuc);
-
+        
         % Plot a point at the tool brush tip with the appropriate color
         % (unless the brush selection is zero)
         if fanuc.brush ~= 0

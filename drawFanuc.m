@@ -3,7 +3,7 @@
 % Lab 2: Robot Picasso
 % March 30, 2020
 
-function [ handles ] = drawFanuc(joint_angles,fanuc)
+function [ handles ] = drawFanuc( joint_angles, fanuc )
 % MECH 498/598 - Intro to Robotics - Spring 2016
 % Lab 2 - Inverse Kinematics
 %
@@ -119,7 +119,7 @@ set(hg,'Parent',T_4);
 h = drawRobotFrame(fanuc.colors{5});
 hg = hggroup('Parent',ax);
 set(h,'Parent',hg);
-L_5 = line([0,0],[0,0],[0,0],...
+L_5 = line([0,0],[0,-l_6],[0,0],...
     'Color',fanuc.colors{5},'LineWidth',1.5);
 set(L_5,'Parent',hg);
 T_5 = hgtransform('Parent',T_4,'Matrix',fanuc_T{5});
